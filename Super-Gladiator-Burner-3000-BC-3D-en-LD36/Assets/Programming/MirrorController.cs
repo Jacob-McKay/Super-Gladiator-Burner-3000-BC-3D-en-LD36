@@ -12,7 +12,7 @@ public class MirrorController : MonoBehaviour {
 	void Start () {
 	    if(deathRayRange > 9000)
         {
-            Debug.LogWarning("Death Ray range is over NINE-THOUSAAAAAAND!!!!1");
+            //Debug.LogWarning("Death Ray range is over NINE-THOUSAAAAAAND!!!!1");
         }
 	}
 	
