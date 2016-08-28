@@ -11,13 +11,17 @@ public class FancyMirrorController : MonoBehaviour
     public Transform mirror;
     public Transform mirrorFrame;
 
+    private Transform _sun;
+
     // Use this for initialization
     void Start()
     {
         if (deathRayRange > 9000)
         {
-            //Debug.LogWarning("Death Ray range is over NINE-THOUSAAAAAAND!!!!1");
+            Debug.LogWarning("Death Ray range is over NINE-THOUSAAAAAAND!!!!1");
         }
+
+        _sun = FindObjectOfType<SunController>().gameObject.transform;
     }
 
     // Update is called once per frame
@@ -25,6 +29,7 @@ public class FancyMirrorController : MonoBehaviour
     {
         RotateMirrorBasedOnMouseMovement();
         ShootDeathRayOfHeavenlyLight();
+        PaintReflectionRaysFromSunOffOfMirror();
     }
 
     private void RotateMirrorBasedOnMouseMovement()
@@ -62,10 +67,20 @@ public class FancyMirrorController : MonoBehaviour
             }
         }
     }
-
+    
     private void PaintDeathRayForVisualEffect()
     {
         Vector3 forward = mirror.transform.TransformDirection(Vector3.forward) * deathRayRange;
         Debug.DrawRay(mirror.transform.position, forward, Color.yellow);
+    }
+
+    private void PaintReflectionRaysFromSunOffOfMirror()
+    {
+        var vectorFromSunToMirror = mirror.transform.position - _sun.position;
+        var mirrorNormal = mirror.transform.forward;
+        var reflectedVectorOffOfMirror = Vector3.Reflect(vectorFromSunToMirror, mirrorNormal);
+        Debug.DrawRay(_sun.position, mirror.transform.position - _sun.position, Color.black);
+        Debug.DrawRay(mirror.transform.position, reflectedVectorOffOfMirror, Color.red, 0.2f);
+        //Debug.DrawLine(_sun.transform.position, mirror.transform.position, Color.green, 0, false);
     }
 }

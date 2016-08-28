@@ -17,6 +17,7 @@ public class SunController : MonoBehaviour {
     public Transform directionalLightTarget;
     public Transform sunrise;
     public Transform sunset;
+    public Transform lensFlareParent;
     public float journeyTime = 1.0F;
     private float startTime;
     void Start()
@@ -28,6 +29,7 @@ public class SunController : MonoBehaviour {
     {
         MoveSunAcrossTheSky();
         AimSunlightAtTarget();
+        AimLenseFlareAtCamera();
     }
 
     private void AimSunlightAtTarget()
@@ -38,11 +40,16 @@ public class SunController : MonoBehaviour {
     private void MoveSunAcrossTheSky()
     {
         Vector3 center = (sunrise.position + sunset.position) * 0.5F;
-        center -= new Vector3(0, 100f, 0);
+        center -= new Vector3(0, 50, 0);
         Vector3 riseRelCenter = sunrise.position - center;
         Vector3 setRelCenter = sunset.position - center;
         float fracComplete = (Time.time - startTime) / journeyTime;
         transform.position = Vector3.Slerp(riseRelCenter, setRelCenter, fracComplete);
         transform.position += center;
+    }
+
+    private void AimLenseFlareAtCamera()
+    {
+        lensFlareParent.LookAt(Camera.main.transform);
     }
 }
