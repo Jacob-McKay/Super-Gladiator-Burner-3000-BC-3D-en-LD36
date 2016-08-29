@@ -29,7 +29,6 @@ public class FancyMirrorController : MonoBehaviour
     {
         RotateMirrorBasedOnMouseMovement();
         ShootDeathRayOfHeavenlyLight();
-        PaintReflectionRaysFromSunOffOfMirror();
     }
 
     private void RotateMirrorBasedOnMouseMovement()
@@ -46,41 +45,39 @@ public class FancyMirrorController : MonoBehaviour
         float xDelta = CrossPlatformInputManager.GetAxis("Mouse X");
         float yDelta = CrossPlatformInputManager.GetAxis("Mouse Y");
 
-        Debug.Log("Movement detected: " + new Vector2(xDelta, yDelta));
+        //Debug.Log("Movement detected: " + new Vector2(xDelta, yDelta));
 
         return new Vector2(xDelta, yDelta);
     }
 
     private void ShootDeathRayOfHeavenlyLight()
     {
+        var vectorFromSunToMirror = mirror.transform.position - _sun.position;
+        var mirrorNormal = mirror.transform.forward;
+        var reflectedVectorOffOfMirror = Vector3.Reflect(vectorFromSunToMirror, mirrorNormal);
+
         PaintDeathRayForVisualEffect();
         RaycastHit hit;
-        if (Physics.Raycast(mirror.transform.position, mirror.transform.forward, out hit, deathRayRange))
+        if (Physics.Raycast(mirror.transform.position, reflectedVectorOffOfMirror, out hit, deathRayRange))
         {
-
             GameObject objectHit = hit.transform.gameObject;
+            Debug.Log("I hit something! " + objectHit.name);
+
             if (objectHit.tag == "Burnable")
             {
                 Debug.Log("BURNABLE HIT!");
-                var burnable = objectHit.GetComponent<Burnable>();
+                var burnable = objectHit.GetComponent<IBurnable>();
                 burnable.Burn();
             }
         }
     }
-    
-    private void PaintDeathRayForVisualEffect()
-    {
-        Vector3 forward = mirror.transform.TransformDirection(Vector3.forward) * deathRayRange;
-        Debug.DrawRay(mirror.transform.position, forward, Color.yellow);
-    }
 
-    private void PaintReflectionRaysFromSunOffOfMirror()
+    private void PaintDeathRayForVisualEffect()
     {
         var vectorFromSunToMirror = mirror.transform.position - _sun.position;
         var mirrorNormal = mirror.transform.forward;
         var reflectedVectorOffOfMirror = Vector3.Reflect(vectorFromSunToMirror, mirrorNormal);
         Debug.DrawRay(_sun.position, mirror.transform.position - _sun.position, Color.black);
         Debug.DrawRay(mirror.transform.position, reflectedVectorOffOfMirror, Color.red, 0.2f);
-        //Debug.DrawLine(_sun.transform.position, mirror.transform.position, Color.green, 0, false);
     }
 }

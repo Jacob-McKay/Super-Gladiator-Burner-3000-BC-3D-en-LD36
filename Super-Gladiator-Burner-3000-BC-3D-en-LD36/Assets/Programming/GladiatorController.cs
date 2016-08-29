@@ -1,30 +1,70 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GladiatorController : MonoBehaviour {
+public class GladiatorController : MonoBehaviour, IBurnable {
+    public int health = 10;
+    public float standingAroundSeconds = 1;
+    public GameObject targetsParent;
+    public Transform currentTarget;
+    
     private Animator _animator;
+    private NavMeshAgent _agent;
+    private Transform[] _possibleTargets;
+
+    private float _timeInstantiated;
+    private float _timeToStartRunningAround;
+    private bool _runningAround;
+    private int _timesBurned;
+    private bool _alive = true;
 
 	// Use this for initialization
 	void Start () {
-	    _animator = GetComponent<Animator>();
+        _agent = GetComponent<NavMeshAgent>();
+        _animator = GetComponent<Animator>();
+        _timeInstantiated = Time.time;
+        _timeToStartRunningAround = _timeInstantiated + standingAroundSeconds;
+
+        _possibleTargets = targetsParent.GetComponentsInChildren<Transform>();
+        currentTarget = _possibleTargets[Random.Range(0, _possibleTargets.Length)];
+        //Debug.Log("possible targets: " + _possibleTargets + " current target: " + currentTarget);
     }
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetKeyDown(KeyCode.W)){
+
+        if(_alive && !_runningAround && Time.time >= _timeToStartRunningAround)
+        {
+            _agent.destination = currentTarget.position;
             _animator.SetTrigger("EnteredArena");
+            _runningAround = true;
         }
-        if (Input.GetKeyDown(KeyCode.S))
+
+        if (_alive && _runningAround && _agent.remainingDistance < 0.5f)
+        {
+            SelectNextTargetAtRandom();
+        }
+    }
+
+    private void SelectNextTargetAtRandom()
+    {
+        currentTarget = _possibleTargets[Random.Range(0, _possibleTargets.Length)];
+        _agent.destination = currentTarget.position;
+    }
+
+    public void Burn()
+    {
+        if (_alive)
         {
             _animator.SetTrigger("SetOnFire");
-        }
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            _animator.SetTrigger("Die");
-        }
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            _animator.SetTrigger("Extinguished");
+            Debug.Log("EEEEEEEKK!!!1111  I'm Burnin'!!!!");
+            _timesBurned++;
+
+            if (_timesBurned > health)
+            {
+                _animator.SetTrigger("Die");
+                _agent.Stop();
+                _alive = false; // >:)
+            }
         }
     }
 }

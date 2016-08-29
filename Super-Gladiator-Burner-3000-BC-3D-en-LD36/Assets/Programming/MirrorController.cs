@@ -50,7 +50,7 @@ public class MirrorController : MonoBehaviour {
             if (objectHit.tag == "Burnable")
             {
                 Debug.Log("BURNABLE HIT!");
-                var burnable = objectHit.GetComponent<Burnable>();
+                var burnable = objectHit.GetComponent<IBurnable>();
                 burnable.Burn();
             }
         }
