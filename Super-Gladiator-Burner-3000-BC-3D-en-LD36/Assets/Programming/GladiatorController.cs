@@ -25,7 +25,7 @@ public class GladiatorController : MonoBehaviour, IBurnable {
 	void Start () {
         _gameController = FindObjectOfType<GameController>();
         _flameSource = GetComponentInChildren<ParticleSystem>();
-        _flameSource.Stop();
+        _flameSource.gameObject.SetActive(false);
         _agent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
         _timeInstantiated = Time.time;
@@ -63,7 +63,7 @@ public class GladiatorController : MonoBehaviour, IBurnable {
         if (_alive)
         {
             _onFire = true;
-            _flameSource.Play();
+            _flameSource.gameObject.SetActive(true);
             _animator.SetTrigger("SetOnFire");
             Debug.Log("EEEEEEEKK!!!1111  I'm Burnin'!!!!");
             _timesBurned++;
