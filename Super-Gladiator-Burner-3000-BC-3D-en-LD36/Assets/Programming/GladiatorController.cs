@@ -6,7 +6,10 @@ public class GladiatorController : MonoBehaviour, IBurnable {
     public float standingAroundSeconds = 1;
     public GameObject targetsParent;
     public Transform currentTarget;
-    
+
+    private GameController _gameController;
+
+    private ParticleSystem _flameSource;
     private Animator _animator;
     private NavMeshAgent _agent;
     private Transform[] _possibleTargets;
@@ -16,9 +19,13 @@ public class GladiatorController : MonoBehaviour, IBurnable {
     private bool _runningAround;
     private int _timesBurned;
     private bool _alive = true;
+    private bool _onFire = false;
 
 	// Use this for initialization
 	void Start () {
+        _gameController = FindObjectOfType<GameController>();
+        _flameSource = GetComponentInChildren<ParticleSystem>();
+        _flameSource.Stop();
         _agent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
         _timeInstantiated = Time.time;
@@ -55,6 +62,8 @@ public class GladiatorController : MonoBehaviour, IBurnable {
     {
         if (_alive)
         {
+            _onFire = true;
+            _flameSource.Play();
             _animator.SetTrigger("SetOnFire");
             Debug.Log("EEEEEEEKK!!!1111  I'm Burnin'!!!!");
             _timesBurned++;
@@ -64,6 +73,7 @@ public class GladiatorController : MonoBehaviour, IBurnable {
                 _animator.SetTrigger("Die");
                 _agent.Stop();
                 _alive = false; // >:)
+                _gameController.PlusOneGladiatorDown();
             }
         }
     }

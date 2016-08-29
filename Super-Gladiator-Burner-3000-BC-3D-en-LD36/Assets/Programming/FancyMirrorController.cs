@@ -61,11 +61,11 @@ public class FancyMirrorController : MonoBehaviour
         if (Physics.Raycast(mirror.transform.position, reflectedVectorOffOfMirror, out hit, deathRayRange))
         {
             GameObject objectHit = hit.transform.gameObject;
-            Debug.Log("I hit something! " + objectHit.name);
+            //Debug.Log("I hit something! " + objectHit.name);
 
             if (objectHit.tag == "Burnable")
             {
-                Debug.Log("BURNABLE HIT!");
+                //Debug.Log("BURNABLE HIT!");
                 var burnable = objectHit.GetComponent<IBurnable>();
                 burnable.Burn();
             }
