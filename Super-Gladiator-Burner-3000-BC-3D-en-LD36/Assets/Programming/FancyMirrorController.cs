@@ -8,6 +8,10 @@ public class FancyMirrorController : MonoBehaviour
     public float rotationMultiplier = 1;
     public float deathRayRange = 9001;
 
+    public GameObject smoke;
+    GameObject smokeClone;
+    public float smokeTimer;
+
     public Transform mirror;
     public Transform mirrorFrame;
 
@@ -29,6 +33,7 @@ public class FancyMirrorController : MonoBehaviour
     {
         RotateMirrorBasedOnMouseMovement();
         ShootDeathRayOfHeavenlyLight();
+        smokeTimer += Time.deltaTime;
     }
 
     private void RotateMirrorBasedOnMouseMovement()
@@ -68,6 +73,13 @@ public class FancyMirrorController : MonoBehaviour
                 //Debug.Log("BURNABLE HIT!");
                 var burnable = objectHit.GetComponent<IBurnable>();
                 burnable.Burn();
+            }
+            if (hit.collider.tag == "Floor")
+            {
+                Debug.Log("Floor!");
+                smokeClone = Instantiate(smoke, hit.point, Quaternion.identity) as GameObject;
+                Destroy(smokeClone, 3f);
+                smokeTimer = 0f;
             }
         }
     }

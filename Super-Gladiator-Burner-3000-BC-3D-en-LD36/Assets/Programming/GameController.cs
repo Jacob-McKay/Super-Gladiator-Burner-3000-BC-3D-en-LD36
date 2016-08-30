@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour {
 
@@ -36,6 +37,7 @@ public class GameController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        Cursor.lockState = CursorLockMode.Locked;
         _ui = FindObjectOfType<UIController>();
         _ui.UpdateLevel(level);
         _ui.UpdateScore(_score);
@@ -46,6 +48,23 @@ public class GameController : MonoBehaviour {
 
         StartCoroutine(BeginTimedReleaseWaves());
 	}
+
+    void Update ()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            Application.Quit();
+        }
+    }
 	
 
     public void SunHasSet()

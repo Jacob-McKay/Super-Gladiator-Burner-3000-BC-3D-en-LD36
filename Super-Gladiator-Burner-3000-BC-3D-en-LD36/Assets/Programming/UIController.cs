@@ -7,6 +7,7 @@ public class UIController : MonoBehaviour {
     public Text levelText;
     public Text scoreText;
     public Text gameOverText;
+    public Text gameOverInstructionsText;
     public Image screenFader;
 
     public float secondsTilFullFade = 0.5f;
@@ -25,6 +26,7 @@ public class UIController : MonoBehaviour {
 
     public void GameOver(string gameOverMessage)
     {
+        gameOverInstructionsText.text = "Press 'R' to restart \nPress 'Q' to quit";
         gameOverText.text = gameOverMessage;
         StartCoroutine(CoGameover(Time.time, Time.time + secondsTilFullFade));
     }
