@@ -14,14 +14,19 @@ public class SunController : MonoBehaviour {
     //void Update () {
     //       transform.RotateAround(targetToAimAt.position, transform.up, Time.deltaTime * sunRotateSpeed);
     //}
+
     public Transform directionalLightTarget;
     public Transform sunrise;
     public Transform sunset;
     public Transform lensFlareParent;
     public float journeyTime = 1.0F;
     private float startTime;
+
+    private GameController _gameController;
+
     void Start()
     {
+        _gameController = FindObjectOfType<GameController>();
         startTime = Time.time;
     }
 
@@ -30,6 +35,14 @@ public class SunController : MonoBehaviour {
         MoveSunAcrossTheSky();
         AimSunlightAtTarget();
         AimLenseFlareAtCamera();
+    }
+
+    public void ResetSun()
+    {
+        transform.position = sunrise.position;
+        startTime = Time.time;
+        AimLenseFlareAtCamera();
+        AimSunlightAtTarget();
     }
 
     private void AimSunlightAtTarget()
@@ -46,6 +59,11 @@ public class SunController : MonoBehaviour {
         float fracComplete = (Time.time - startTime) / journeyTime;
         transform.position = Vector3.Slerp(riseRelCenter, setRelCenter, fracComplete);
         transform.position += center;
+
+        if (fracComplete >= 1)
+        {
+            _gameController.SunHasSet();
+        }
     }
 
     private void AimLenseFlareAtCamera()

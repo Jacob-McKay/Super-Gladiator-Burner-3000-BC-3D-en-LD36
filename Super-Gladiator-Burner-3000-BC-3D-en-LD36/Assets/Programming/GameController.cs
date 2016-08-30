@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class GameController : MonoBehaviour {
 
@@ -31,24 +32,47 @@ public class GameController : MonoBehaviour {
     private List<Transform> _temporarySpawnChoices;
 
     private UIController _ui;
+    private SunController _sun;
+
 	// Use this for initialization
 	void Start () {
         _ui = FindObjectOfType<UIController>();
         _ui.UpdateLevel(level);
         _ui.UpdateScore(_score);
 
+        _sun = FindObjectOfType<SunController>();
+
         gladiatorSpawns = gladiatorSpawnsParent.GetComponentsInChildren<Transform>();
 
         StartCoroutine(BeginTimedReleaseWaves());
 	}
 	
-	// Update is called once per frame
-	void Update () {
-        if (Input.GetKeyDown(KeyCode.S))
+
+    public void SunHasSet()
+    {
+        // var numGladiatorsInLevel = waves[level].ToList().Aggregate((runningTotal, numInWave) => { return runningTotal + numInWave; });
+        // Debug.Log("There are: " + numGladiatorsInLevel + " Gladiators in the level");
+        var gladiatorsInScene = FindObjectsOfType<GladiatorController>();
+        var numGladiatorsInScene = gladiatorsInScene.Length;
+        Debug.Log("There are: " + numGladiatorsInScene + " Gladiators in the scene");
+
+        var numDeadGladiatorsInScene = gladiatorsInScene.Where((gladiator) => gladiator.IsDead()).Count();
+        Debug.Log("There are: " + numDeadGladiatorsInScene + " DEAD Gladiators in the scene");
+
+        var numGladiatorsLeftLiving = numGladiatorsInScene - numDeadGladiatorsInScene;
+        if(numGladiatorsLeftLiving > 0)
         {
-            SpawnWave();
+            _ui.GameOver("You failed, you allowed: " + numGladiatorsLeftLiving + " gladiators to live \nTry harder next time!");
+        } else
+        {
+            gladiatorsInScene.ToList().ForEach((gladiator) => Destroy(gladiator.gameObject));
+            _sun.ResetSun();
+            _currentWave = 0;
+            level++;
+            _ui.UpdateLevel(level);
+            StartCoroutine(BeginTimedReleaseWaves());
         }
-	}
+    }
 
     public void PlusOneGladiatorDown()
     {

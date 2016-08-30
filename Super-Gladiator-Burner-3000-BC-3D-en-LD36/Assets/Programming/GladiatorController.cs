@@ -52,6 +52,11 @@ public class GladiatorController : MonoBehaviour, IBurnable {
         }
     }
 
+    public bool IsDead()
+    {
+        return !_alive;
+    }
+
     private void SelectNextTargetAtRandom()
     {
         currentTarget = _possibleTargets[Random.Range(0, _possibleTargets.Length)];
