@@ -2,9 +2,11 @@
 using UnityStandardAssets.CrossPlatformInput;
 
 using System.Collections;
+using Assets.Programming;
 
 public class FancyMirrorController : MonoBehaviour
 {
+    public float gyroRotationMultiplier = 10;
     public float rotationMultiplier = 1;
     public float deathRayRange = 9001;
 
@@ -14,8 +16,13 @@ public class FancyMirrorController : MonoBehaviour
 
     public Transform mirror;
     public Transform mirrorFrame;
-
     private Transform _sun;
+
+
+    // this is for lerping the rotation last received from the phone to prevent the jitters
+    //public float applyGryoRotationSmooth = 1;
+    //private Quaternion targetRotation;
+
 
     // Use this for initialization
     void Start()
@@ -34,6 +41,13 @@ public class FancyMirrorController : MonoBehaviour
         RotateMirrorBasedOnMouseMovement();
         ShootDeathRayOfHeavenlyLight();
         smokeTimer += Time.deltaTime;
+    }
+
+    public void ApplyGryoRotation(RedneckGyroData gyroRead)
+    {
+        var gyroMultiplier = 5;
+        mirror.transform.Rotate(gyroRead.y * gyroMultiplier, 0, 0);
+        mirrorFrame.transform.Rotate(0, gyroRead.x * gyroMultiplier * -1, 0);
     }
 
     private void RotateMirrorBasedOnMouseMovement()

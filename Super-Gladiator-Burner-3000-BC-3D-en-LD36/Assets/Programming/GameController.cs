@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.SceneManagement;
+using SocketIO;
+using Assets.Programming;
 
 public class GameController : MonoBehaviour {
 
@@ -34,6 +36,10 @@ public class GameController : MonoBehaviour {
 
     private UIController _ui;
     private SunController _sun;
+    private SocketIOComponent _socketIO;
+    private FancyMirrorController _mirror;
+
+    private RedneckGyroData _lastGryoRead;
 
 	// Use this for initialization
 	void Start () {
@@ -43,6 +49,11 @@ public class GameController : MonoBehaviour {
         _ui.UpdateScore(_score);
 
         _sun = FindObjectOfType<SunController>();
+
+        _mirror = FindObjectOfType<FancyMirrorController>();
+
+        _socketIO = FindObjectOfType<SocketIOComponent>();
+        _socketIO.On("chat message", OnMessageReceived);
 
         gladiatorSpawns = gladiatorSpawnsParent.GetComponentsInChildren<Transform>();
 
@@ -65,7 +76,6 @@ public class GameController : MonoBehaviour {
             Application.Quit();
         }
     }
-	
 
     public void SunHasSet()
     {
@@ -98,6 +108,55 @@ public class GameController : MonoBehaviour {
         _score++;
         _ui.UpdateScore(_score);
     }
+
+    void OnMessageReceived(SocketIOEvent obj)
+    {
+
+        var gyroRead = new RedneckGyroData
+        {
+            x = float.Parse(obj.data["x"].ToString()),
+            y = float.Parse(obj.data["y"].ToString()),
+            z = float.Parse(obj.data["z"].ToString()),
+            timestamp = float.Parse(obj.data["timestamp"].ToString()),
+        };
+        _mirror.ApplyGryoRotation((gyroRead));
+
+        if(_lastGryoRead.timestamp > gyroRead.timestamp)
+        {
+            Debug.LogError("HOLY BUTTS THE STUFF IS OUT OF ORDER, WTF ARE WE GONNA DO!???");
+        } else
+        {
+            _lastGryoRead = gyroRead;
+        }
+    }
+
+    /*
+
+        	void onUserMove (SocketIOEvent obj)
+	{
+		GameObject player = GameObject.Find(  JsonToString( obj.data.GetField("name").ToString(), "\"") ) as GameObject;
+		player.transform.position =  JsonToVecter3( JsonToString(obj.data.GetField("position").ToString(), "\"") );
+
+	}
+
+	string  JsonToString( string target, string s){
+
+		string[] newString = Regex.Split(target,s);
+
+		return newString[1];
+
+	}
+
+	Vector3 JsonToVecter3(string target ){
+
+		Vector3 newVector;
+		string[] newString = Regex.Split(target,",");
+		newVector = new Vector3( float.Parse(newString[0]), float.Parse(newString[1]), float.Parse(newString[2]));
+
+		return newVector;
+
+	}
+    */
 
     private IEnumerator BeginTimedReleaseWaves()
     {
